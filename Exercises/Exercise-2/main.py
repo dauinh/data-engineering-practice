@@ -1,5 +1,5 @@
 import os
-import signal
+import csv
 from pathlib import Path
 from bs4 import BeautifulSoup
 
@@ -11,12 +11,6 @@ import pandas
 CATALOG_URL = "https://catalog.data.gov"
 DOWNLOAD_DIR = Path("./downloads")
 
-# def handler(signum, frame):
-#     raise Exception("Function timeout")
-
-# # register signal function handler
-# signal.signal(signal.SIGALRM, handler)
-# signal.alarm(10)
 
 def main():
     if os.path.exists(DOWNLOAD_DIR) == False:
@@ -40,10 +34,16 @@ def main():
         soup = BeautifulSoup(r.content, 'html.parser')
         link = soup.find("a", attrs={"data-format": "csv"})
         download_url = link.get("href")
-        # download dataset
-        r = requests.get(download_url)
-        print("downloading dataset...")
 
+        # download dataset then write locally
+        print("downloading dataset...")
+        r = requests.get(download_url)
+        decoded_content = r.content.decode("utf-8")
+        content_reader = csv.reader(decoded_content.splitlines(), delimiter=",")
+        with open(DOWNLOAD_DIR / "temperature.csv", "w") as outfile:
+            writer = csv.writer(outfile, delimiter=',')
+            for row in content_reader:
+                writer.writerow(row)
 
     except Exception as e:
         print(e)
