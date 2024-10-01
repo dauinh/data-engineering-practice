@@ -45,6 +45,11 @@ def main():
             for row in content_reader:
                 writer.writerow(row)
 
+        # find the records with the highest
+        df = pandas.read_csv(DOWNLOAD_DIR / "temperature.csv")
+        airtemp = df['AirTemp']
+        print(airtemp.max())
+
     except Exception as e:
         print(e)
     print("hello world")
